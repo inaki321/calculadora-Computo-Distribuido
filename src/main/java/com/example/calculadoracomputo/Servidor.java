@@ -45,7 +45,7 @@ public class Servidor {
 
             //Send connection to the server
             oosS = new ObjectOutputStream(socketS.getOutputStream());
-            System.out.println("Mandando solicitud al servidor");
+            System.out.println("Mandando solicitud al servidor: "+(i+1));
             oosS.writeObject(message); //data to send to the server
 
             //Recieve from server
@@ -57,7 +57,7 @@ public class Servidor {
             catch(Exception e) {
                 System.out.println("Server regreso una excepcion "+e);
             }
-            System.out.println("Mensaje del servidorONE : " + serverMessage);
+            System.out.println("Servidor: "+ (i+1 )+" Mensaje: "+ serverMessage);
             }
             //send message to other servers OMKFO ------------------------------
 
