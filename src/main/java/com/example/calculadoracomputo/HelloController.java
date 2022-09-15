@@ -53,10 +53,18 @@ public class HelloController {
 
     private void sendToNode(String number, ActionEvent event) throws IOException {
         String res = "";
+        String res2 = "";
         number = labelDisplay.getText();
         Cliente clientObj = new Cliente();
         res = clientObj.RecieveFromUI(labelDisplay.getText());
-        labelDisplay.setText(res);
+        ClienteTwo clientObj2 = new ClienteTwo();
+        res2 = clientObj2.RecieveFromUI(labelDisplay.getText());
+        if(!(res.equals(""))){
+            labelDisplay.setText(res);
+        }
+        else {
+            labelDisplay.setText(res2);
+        }
     }
 
     static void define(String word, Writer writer, BufferedReader reader)

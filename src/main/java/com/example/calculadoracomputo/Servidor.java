@@ -73,6 +73,7 @@ public class Servidor {
             socket.close();
             //terminate the server if client sends exit request
             if (message.equalsIgnoreCase("exit")) break;
+            //if(!(serverMessage.equals(""))) break; // to break in case a server worked
         }
         System.out.println("Apagando servidor...");
         //close the ServerSocket object

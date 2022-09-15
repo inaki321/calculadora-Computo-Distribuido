@@ -7,10 +7,9 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class Cliente {
-
-    public String RecieveFromUI(String operation) throws UnknownHostException,IOException {
-        System.out.println("Recibo esto en cliente 1:  "+operation);
+public class ClienteTwo {
+    public String RecieveFromUI(String operation) throws UnknownHostException, IOException {
+        System.out.println("Recibo esto en cliente 2:  "+operation);
         //get the localhost IP address, if server is running on some other IP, you need to use that
         InetAddress host = InetAddress.getLocalHost();
         Socket socket = null;
@@ -21,7 +20,7 @@ public class Cliente {
 
         //Send connection to the server
         oos = new ObjectOutputStream(socket.getOutputStream());
-        System.out.println("Mandando solicitud al nodo desde cliente 1");
+        System.out.println("Mandando solicitud al nodo desde cliente 2");
         oos.writeObject(operation); //data to send to the server
 
         //Racieve from server
@@ -33,7 +32,7 @@ public class Cliente {
         catch(Exception e) {
             System.out.println("Server regreso una excepcion "+e);
         }
-        System.out.println("Mensaje del servidor en cliente 1: " + serverMessage);
+        System.out.println("Mensaje del servidor en cliente 2: " + serverMessage);
 
         //close client and server connection
         ois.close();

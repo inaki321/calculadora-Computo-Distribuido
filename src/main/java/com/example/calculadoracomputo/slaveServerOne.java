@@ -77,7 +77,6 @@ public class slaveServerOne {
                     opreationSymbol = operationsArray.get(i);
                     Thread.currentThread().interrupt();
                 }
-                System.out.println("----------------------------  ");
             }
 
             //Calculando
