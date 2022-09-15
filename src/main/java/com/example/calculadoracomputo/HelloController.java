@@ -52,9 +52,11 @@ public class HelloController {
 
 
     private void sendToNode(String number, ActionEvent event) throws IOException {
+        String res = "";
         number = labelDisplay.getText();
         Cliente clientObj = new Cliente();
-        clientObj.RecieveFromUI(labelDisplay.getText());
+        res = clientObj.RecieveFromUI(labelDisplay.getText());
+        labelDisplay.setText(res);
     }
 
     static void define(String word, Writer writer, BufferedReader reader)
@@ -63,33 +65,5 @@ public class HelloController {
         writer.flush();
     }
 
-
-    private void receiveFromNode() {
-        String hostname = "127.0.0.1";
-        Socket socket = null;
-        try {
-            socket = new Socket(hostname, 8000);
-            socket.setSoTimeout(15000);
-            InputStream in = socket.getInputStream();
-            StringBuilder answer = new StringBuilder();
-            InputStreamReader reader = new InputStreamReader(in, "ASCII");
-            for (int c = reader.read(); c != -1; c = reader.read()) {
-                answer.append((char) c);
-            }
-            String result = answer.toString();
-            labelDisplay.setText(result);
-        } catch (
-                IOException ex) {
-            System.err.println(ex);
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException ex) {
-                    // ignore
-                }
-            }
-        }
-    }
 
 }

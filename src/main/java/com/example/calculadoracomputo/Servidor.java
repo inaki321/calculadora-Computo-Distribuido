@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.ClassNotFoundException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,71 +21,52 @@ public class Servidor {
         server = new ServerSocket(port);
         //keep listens indefinitely until receives 'exit' call or program terminates
         while (true) {
-            System.out.println("Waiting for the client request");
+            System.out.println("Esperando la solicitud del cliente ");
             //creating socket and waiting for client connection
             Socket socket = server.accept();
             //read from socket to ObjectInputStream object
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             //convert ObjectInputStream object to String
             String message = (String) ois.readObject();
-            System.out.println(" Server Operation Received: " + message);
+
+            // send message to the server OMKFO ----------------------------
+            String serverMessage = "";
+            List<Integer> serversList = new ArrayList<Integer>();
+            serversList.add(9877);
+            serversList.add(9878);
+            for (int i = 0; i < 2; i++) {
+            InetAddress host = InetAddress.getLocalHost();
+            Socket socketS = null;
+            ObjectOutputStream oosS = null;
+            ObjectInputStream oisS = null;
+            //establish socket connection to server
+            //socketS = new Socket(host.getHostName(), 9877);
+                socketS = new Socket(host.getHostName(), serversList.get(i));
+
+            //Send connection to the server
+            oosS = new ObjectOutputStream(socketS.getOutputStream());
+            System.out.println("Mandando solicitud al servidor");
+            oosS.writeObject(message); //data to send to the server
+
+            //Recieve from server
+            oisS = new ObjectInputStream(socketS.getInputStream());
+
+            try {
+                serverMessage = (String) oisS.readObject();
+            }
+            catch(Exception e) {
+                System.out.println("Server regreso una excepcion "+e);
+            }
+            System.out.println("Mensaje del servidorONE : " + serverMessage);
+            }
+            //send message to other servers OMKFO ------------------------------
+
+            System.out.println(" Mensaje recibido en el nodo: " + message);
             //create ObjectOutputStream object
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
             //write object to Socket
-            //Calculando
 
-            //character to get in each iteration
-            Character numberaux;
-
-            //aux number to use in iteration before an space
-            String numberFromString = "";
-
-            //suma a ir sumando,restando etc
-            List<String> operationsArray = new ArrayList<String>();
-
-            for (int i = 0; i <= message.length() - 1; i = i + 1) {
-                numberaux = message.charAt(i);
-                if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
-                    operationsArray.add(numberFromString);
-                    numberFromString = "";
-                } else {
-                    numberFromString = numberFromString + numberaux;
-                }
-                if (message.length() - 1 == i) {
-                    operationsArray.add(numberFromString);
-                }
-            }
-
-
-            float val = 0, res = 0, lastVal = 0;
-
-            String opreationSymbol = "";
-            for (int i = 0; i <= operationsArray.size() - 1; i = i + 1) {
-
-                try {
-                    val = Float.parseFloat(operationsArray.get(i));
-                    if (opreationSymbol.equals("+")) {
-                        lastVal = lastVal + val;
-                    } else if (opreationSymbol.equals("-")) {
-                        lastVal = lastVal - val;
-                    } else if (opreationSymbol.equals("/")) {
-                        lastVal = lastVal / val;
-                    } else if (opreationSymbol.equals("*")) {
-                        lastVal = lastVal * val;
-                    }
-                    //for the first iteration just get the last value
-                    if (i == 0) {
-                        lastVal = val;
-                    }
-                } catch (Exception e) {
-                    opreationSymbol = operationsArray.get(i);
-                    Thread.currentThread().interrupt();
-                }
-                System.out.println("----------------------------  ");
-            }
-
-            //Calculando
-            oos.writeObject("Result from server   " + lastVal);
+            oos.writeObject(""+serverMessage );
             //close resources
             ois.close();
             oos.close();
@@ -92,7 +74,7 @@ public class Servidor {
             //terminate the server if client sends exit request
             if (message.equalsIgnoreCase("exit")) break;
         }
-        System.out.println("Shutting down Socket server!!");
+        System.out.println("Apagando servidor...");
         //close the ServerSocket object
         server.close();
     }
