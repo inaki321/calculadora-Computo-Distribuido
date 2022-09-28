@@ -1,14 +1,13 @@
 package com.example.calculadoracomputo;
 
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+        import javafx.event.ActionEvent;
+        import javafx.fxml.FXML;
+        import javafx.scene.control.Button;
+        import javafx.scene.control.Label;
+        import java.io.*;
+        import java.net.Socket;
 
-import java.io.*;
-import java.net.Socket;
-
-public class HelloController {
+public class Calculadora2Controller {
     @FXML
     private Label labelDisplay;
 
@@ -57,14 +56,7 @@ public class HelloController {
         number = labelDisplay.getText();
         Cliente clientObj = new Cliente();
         res = clientObj.RecieveFromUI(labelDisplay.getText());
-        ClienteTwo clientObj2 = new ClienteTwo();
-        res2 = clientObj2.RecieveFromUI(labelDisplay.getText());
-        if(!(res.equals(""))){
-            labelDisplay.setText(res);
-        }
-        else {
-            labelDisplay.setText(res2);
-        }
+        labelDisplay.setText(res);
     }
 
     static void define(String word, Writer writer, BufferedReader reader)

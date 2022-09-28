@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Servidor {
+public class ServidorNodo {
     //static ServerSocket variable
     private static ServerSocket server;
     //socket server port on which it will listen
@@ -35,29 +35,29 @@ public class Servidor {
             serversList.add(9877);
             serversList.add(9878);
             for (int i = 0; i < 2; i++) {
-            InetAddress host = InetAddress.getLocalHost();
-            Socket socketS = null;
-            ObjectOutputStream oosS = null;
-            ObjectInputStream oisS = null;
-            //establish socket connection to server
-            //socketS = new Socket(host.getHostName(), 9877);
+                InetAddress host = InetAddress.getLocalHost();
+                Socket socketS = null;
+                ObjectOutputStream oosS = null;
+                ObjectInputStream oisS = null;
+                //establish socket connection to server
+                //socketS = new Socket(host.getHostName(), 9877);
                 socketS = new Socket(host.getHostName(), serversList.get(i));
 
-            //Send connection to the server
-            oosS = new ObjectOutputStream(socketS.getOutputStream());
-            System.out.println("Mandando solicitud al servidor: "+(i+1));
-            oosS.writeObject(message); //data to send to the server
+                //Send connection to the server
+                oosS = new ObjectOutputStream(socketS.getOutputStream());
+                System.out.println("Mandando solicitud al servidor: "+(i+1));
+                oosS.writeObject(message); //data to send to the server
 
-            //Recieve from server
-            oisS = new ObjectInputStream(socketS.getInputStream());
+                //Recieve from server
+                oisS = new ObjectInputStream(socketS.getInputStream());
 
-            try {
-                serverMessage = (String) oisS.readObject();
-            }
-            catch(Exception e) {
-                System.out.println("Server regreso una excepcion "+e);
-            }
-            System.out.println("Servidor: "+ (i+1 )+" Mensaje: "+ serverMessage);
+                try {
+                    serverMessage = (String) oisS.readObject();
+                }
+                catch(Exception e) {
+                    System.out.println("Server regreso una excepcion "+e);
+                }
+                System.out.println("Servidor: "+ (i+1 )+" Mensaje: "+ serverMessage);
             }
             //send message to other servers OMKFO ------------------------------
 

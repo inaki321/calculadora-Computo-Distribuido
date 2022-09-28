@@ -7,7 +7,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.calculadoracomputo.HelloController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.calculadoracomputo.Calculadora1Controller">
     <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="600.0">
         <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#363636" height="476.0" stroke="BLACK" strokeType="INSIDE" width="600.0" />
         <Label fx:id="labelDisplay" layoutX="74.0" layoutY="11.0" prefHeight="59.0" prefWidth="467.0" text="0" textFill="WHITE">
