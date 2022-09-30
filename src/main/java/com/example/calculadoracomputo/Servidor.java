@@ -3,35 +3,44 @@ package com.example.calculadoracomputo;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.ClassNotFoundException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+public class Servidor {
 
-public class slaveServerOne {
-    //static ServerSocket variable
-    private static ServerSocket server;
+    //get the localhost IP address
+    public static InetAddress host;
+    public static Socket socket = null;
+    public static ObjectOutputStream oos = null;
+    public static ObjectInputStream ois = null;
+
     //socket server port on which it will listen
-    private static int port = 9877;
-    public static void main(String args[]) throws IOException, ClassNotFoundException {
-        //create the socket server object
-        server = new ServerSocket(port);
-        while (true) {
-            System.out.println("Esperando la solicitud del nodo en servidor 1 ");
-            //creating socket and waiting for client connection
-            Socket socket = server.accept();
-            //read from socket to ObjectInputStream object
-            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+    private static int nodo_port = 3332;
+
+    public static void main(String args[]) throws IOException, ClassNotFoundException{
+
+        host = InetAddress.getLocalHost();
+        socket = new Socket(host.getHostName(), nodo_port);
+        System.out.println("Conexion establecida con nodo en el puerto: " + Integer.toString(nodo_port));
+
+        //read write from ObjectInputStream ObjectOutputStream objects
+        ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+
+        //keep listens indefinitely until receives 'exit' call or program terminates
+        while(true){
+
+            System.out.println("Esperando solictud...");
+
             //convert ObjectInputStream object to String
             String message = (String) ois.readObject();
-            System.out.println(" Mensaje recibido en el server 1: " + message);
-            //create ObjectOutputStream object
-            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-            //write object to Socket
 
-            //Calculando
+            System.out.println("Mensaje recibido del nodo: " + message);
+
+            //CALCULAR
             //character to get in each iteration
             Character numberaux;
 
@@ -40,7 +49,6 @@ public class slaveServerOne {
 
             //suma a ir sumando,restando etc
             List<String> operationsArray = new ArrayList<String>();
-
             for (int i = 0; i <= message.length() - 1; i = i + 1) {
                 numberaux = message.charAt(i);
                 if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
@@ -54,7 +62,7 @@ public class slaveServerOne {
                 }
             }
             float val = 0, res = 0, lastVal = 0;
-
+            System.out.println("operations array : " + operationsArray);
             String opreationSymbol = "";
             for (int i = 0; i <= operationsArray.size() - 1; i = i + 1) {
 
@@ -78,20 +86,19 @@ public class slaveServerOne {
                     Thread.currentThread().interrupt();
                 }
             }
+            System.out.println("RESULTADOOOO "+lastVal);
+            oos.writeObject("resultado'"+Double.toString(lastVal)); // {type of message},{content}
 
-            //Calculando
+            //CALCULAR
 
-            oos.writeObject(""+lastVal );
-            //close resources
-            ois.close();
-            oos.close();
-            socket.close();
             //terminate the server if client sends exit request
-            if (message.equalsIgnoreCase("exit")) break;
+            if(message.equalsIgnoreCase("exit")) break;
         }
-        System.out.println("Apagando servidor 1...");
-        //close the ServerSocket object
-        server.close();
-    }
+        System.out.println("Shutting down Socket server!!");
+        //close resources
+        ois.close();
+        oos.close();
+        socket.close();
 
+    }
 }

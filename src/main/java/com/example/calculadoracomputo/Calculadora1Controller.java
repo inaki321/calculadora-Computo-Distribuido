@@ -1,15 +1,43 @@
 package com.example.calculadoracomputo;
 
+import javafx.application.Platform;
+import javafx.css.StyleableStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class Calculadora1Controller {
     @FXML
     private Label labelDisplay;
+    //get the localhost IP address 
+    public InetAddress host;
+    public Socket socket = null;
+    public ObjectOutputStream oos = null;
+    public ObjectInputStream ois = null;
+
+    public int nodePort = 3332;
+
+    public void initialize() throws IOException, ClassNotFoundException {
+        labelDisplay.setText("");
+
+        //get the localhost IP address
+        host = InetAddress.getLocalHost();
+
+        // Create socket
+        socket = new Socket(host.getHostName(), nodePort);
+        System.out.println("[cliente] Conexion establecida con nodo: " + Integer.toString(nodePort));
+
+        //Objects OI Stream
+        oos = new ObjectOutputStream(socket.getOutputStream());
+        ois = new ObjectInputStream(socket.getInputStream());
+
+        //Listening thread ObjectInputStream
+        t.start();
+    }
 
     @FXML
     public void digitEventHandler(ActionEvent event) {
@@ -54,16 +82,46 @@ public class Calculadora1Controller {
         String res = "";
         String res2 = "";
         number = labelDisplay.getText();
-        Cliente clientObj = new Cliente();
-        res = clientObj.RecieveFromUI(labelDisplay.getText());
-        labelDisplay.setText(res);
+        event.consume();
+
+        //operacion should not contain other symbols than */+- and numbers
+        if(!number.matches(".*[a-zA-Z].*")){
+
+            // write to socket using ObjectOutputStream
+            System.out.println("Enviando datos al nodo: " + "operacion,"+number);
+            oos.writeObject(number);
+
+        }
+        else {
+            labelDisplay.setText("Error en la expresión introducida");
+        }
+
     }
 
-    static void define(String word, Writer writer, BufferedReader reader)
-            throws IOException, UnsupportedEncodingException {
-        writer.write(word + "\r\n");
-        writer.flush();
-    }
+    Thread t = new Thread(() -> {
+        //Here write all actions that you want execute on background
+        while(true){
+
+            String message;
+            try {
+                message = (String) ois.readObject();
+                System.out.println("Respuesta recibida en el cliente: " + message);
+
+                String parts[] = message.split("'"); // {type of message},{content}
+
+                if(parts[0].equals("resultado")){
+                    Platform.runLater(() -> {
+                        labelDisplay.setText(parts[1]);
+                    });
+                }
+
+            } catch (ClassNotFoundException | IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    });
 
 
 }
