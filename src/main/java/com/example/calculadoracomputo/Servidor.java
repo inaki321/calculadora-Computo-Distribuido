@@ -18,7 +18,7 @@ public class Servidor {
     public static ObjectInputStream ois = null;
 
     //socket server port on which it will listen
-    private static int nodo_port = 3332;
+    private static int nodo_port = 1234;
 
     public static void main(String args[]) throws IOException, ClassNotFoundException{
 
@@ -62,7 +62,6 @@ public class Servidor {
                 }
             }
             float val = 0, res = 0, lastVal = 0;
-            System.out.println("operations array : " + operationsArray);
             String opreationSymbol = "";
             for (int i = 0; i <= operationsArray.size() - 1; i = i + 1) {
 
@@ -86,15 +85,15 @@ public class Servidor {
                     Thread.currentThread().interrupt();
                 }
             }
-            System.out.println("RESULTADOOOO "+lastVal);
-            oos.writeObject("resultado'"+Double.toString(lastVal)); // {type of message},{content}
+            System.out.println("Resultado a regresar "+lastVal);
+            oos.writeObject("resultado'"+Double.toString(lastVal));
 
             //CALCULAR
 
             //terminate the server if client sends exit request
             if(message.equalsIgnoreCase("exit")) break;
         }
-        System.out.println("Shutting down Socket server!!");
+        System.out.println("Apagando Socket Servidor...");
         //close resources
         ois.close();
         oos.close();

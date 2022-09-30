@@ -9,7 +9,7 @@ import java.util.List;
 public class Nodo {
 
     private static ServerSocket nodoSocket;
-    private static int port = 3332;
+    private static int port = 1234;
 
     public static ArrayList<Socket> clientsList = new ArrayList<Socket>();
     public static ArrayList<ObjectOutputStream> activeOutputStreams = new ArrayList<ObjectOutputStream>();
@@ -102,9 +102,9 @@ public class Nodo {
                         if(temp_oos != oos){
                             temp_oos.writeObject(message);
                             System.out.println("Enviando mensaje: " + message + " al cliente " + clientsList.get(i));
+                            System.out.println("-----------------------------------------" );
                         }
                     }
-                    System.out.println("-----------------------------------------" );
                 }
 
             }

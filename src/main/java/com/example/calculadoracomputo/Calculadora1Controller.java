@@ -19,7 +19,7 @@ public class Calculadora1Controller {
     public ObjectOutputStream oos = null;
     public ObjectInputStream ois = null;
 
-    public int nodePort = 3332;
+    public int nodePort = 1234;
 
     public void initialize() throws IOException, ClassNotFoundException {
         labelDisplay.setText("");
@@ -88,7 +88,7 @@ public class Calculadora1Controller {
         if(!number.matches(".*[a-zA-Z].*")){
 
             // write to socket using ObjectOutputStream
-            System.out.println("Enviando datos al nodo: " + "operacion,"+number);
+            System.out.println("Enviando operacion al nodo: "+number);
             oos.writeObject(number);
 
         }
@@ -106,12 +106,11 @@ public class Calculadora1Controller {
             try {
                 message = (String) ois.readObject();
                 System.out.println("Respuesta recibida en el cliente: " + message);
+                String resSplit[] = message.split("'"); // {type of message},{content}
 
-                String parts[] = message.split("'"); // {type of message},{content}
-
-                if(parts[0].equals("resultado")){
+                if(resSplit[0].equals("resultado")){
                     Platform.runLater(() -> {
-                        labelDisplay.setText(parts[1]);
+                        labelDisplay.setText(resSplit[1]);
                     });
                 }
 
