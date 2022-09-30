@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Servidor {
-
     //get the localhost IP address
     public static InetAddress host;
     public static Socket socket = null;
@@ -18,13 +17,13 @@ public class Servidor {
     public static ObjectInputStream ois = null;
 
     //socket server port on which it will listen
-    private static int nodo_port = 1234;
+    private static int nodoPuerto = 1234;
 
     public static void main(String args[]) throws IOException, ClassNotFoundException{
 
         host = InetAddress.getLocalHost();
-        socket = new Socket(host.getHostName(), nodo_port);
-        System.out.println("Conexion establecida con nodo en el puerto: " + Integer.toString(nodo_port));
+        socket = new Socket(host.getHostName(), nodoPuerto);
+        System.out.println("Conexion establecida con nodo en el puerto: " + Integer.toString(nodoPuerto));
 
         //read write from ObjectInputStream ObjectOutputStream objects
         ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
