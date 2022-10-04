@@ -40,8 +40,7 @@ public class Nodo {
 
                 // Displaying that new client is connected
                 // to server
-                System.out.println("[nodo] Nueva conexion: " + client.getRemoteSocketAddress());
-
+                System.out.println("Nueva conexion: " + client.getRemoteSocketAddress());
 
                 // create a new thread object
                 ClientHandler clientSock = new ClientHandler(client);
@@ -50,6 +49,7 @@ public class Nodo {
                 // separately
 
                 clientsList.add(client);
+                System.out.println("Conexiones activas: " +clientsList.size());
 
                 new Thread(clientSock).start();
             }

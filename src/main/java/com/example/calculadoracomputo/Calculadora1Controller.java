@@ -29,7 +29,7 @@ public class Calculadora1Controller {
 
         // Create socket
         socket = new Socket(host.getHostName(), nodePort);
-        System.out.println("[cliente] Conexion establecida con nodo: " + Integer.toString(nodePort));
+        System.out.println("Conexion establecida con nodo: " + Integer.toString(nodePort));
 
         //Objects OI Stream
         oos = new ObjectOutputStream(socket.getOutputStream());
