@@ -99,7 +99,7 @@ public class Nodo {
 
                         if(temp_oos != oos){
                             temp_oos.writeObject(message);
-                            System.out.println("Enviando mensaje: " + message + " al cliente " + clientsList.get(i));
+                            System.out.println("Enviando mensaje: " + message + " a las conexiones " + clientsList.get(i));
                             System.out.println("-----------------------------------------" );
                         }
                     }
