@@ -85,7 +85,7 @@ public class Servidor {
                 }
             }
             System.out.println("Resultado a regresar "+lastVal);
-            oos.writeObject("resultado'"+Double.toString(lastVal));
+            oos.writeObject("RES:"+Double.toString(lastVal));
 
             //CALCULAR
 

@@ -32,6 +32,7 @@ public class Nodo {
                 else {
                     System.out.println("Conexiones actuales al nodo: ");
                     System.out.println(clientsList);
+                    System.out.println("----------------------------------");
                 }
 
                 // socket object to receive incoming client
@@ -99,7 +100,7 @@ public class Nodo {
 
                         if(temp_oos != oos){
                             temp_oos.writeObject(message);
-                            System.out.println("Enviando mensaje: " + message + " a las conexiones " + clientsList.get(i));
+                            System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
                             System.out.println("-----------------------------------------" );
                         }
                     }
