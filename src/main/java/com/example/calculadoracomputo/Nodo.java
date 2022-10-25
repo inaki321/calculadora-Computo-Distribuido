@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+
 public class Nodo {
     private static ServerSocket nodoSocket;
     private static int port = 1234;
@@ -16,10 +18,23 @@ public class Nodo {
     {
         ServerSocket nodoSocket = null;
         // Lista de clients
-
+        Random rand = new Random();
+        int randomNum=0;
         try {
 
-            nodoSocket = new ServerSocket(port);
+            boolean readyPort=false;
+            while(!readyPort){
+                try {
+                    randomNum = rand.nextInt(5200-5000) + 5000;
+                    nodoSocket = new ServerSocket(randomNum);
+                    readyPort = true;
+                    System.out.println("Nodo creado con puerto: "+randomNum);
+                }
+                catch(Exception e) {
+                    //just in case a socket port is occupied
+                }
+            }
+
             nodoSocket.setReuseAddress(true);
 
             // running infinite loop for getting
@@ -27,10 +42,10 @@ public class Nodo {
             while (true) {
 
                 if(clientsList == null){
-                    System.out.println("Esperando conexiones en el puerto: " + Integer.toString(port));
+                    System.out.println("Esperando conexiones en el puerto: " + Integer.toString(randomNum));
                 }
                 else {
-                    System.out.println("Conexiones actuales al nodo: ");
+                    System.out.println("Conexiones actuales al nodo("+randomNum+"):");
                     System.out.println(clientsList);
                     System.out.println("----------------------------------");
                 }
@@ -108,7 +123,7 @@ public class Nodo {
 
             }
             catch (IOException e) {
-                System.out.println("*Conexion finalizada con el cliente: " + clientSocket.getRemoteSocketAddress());
+                System.out.println("*Conexion finalizada con: " + clientSocket.getRemoteSocketAddress());
                 clientsList.remove(clientSocket);
                 activeOutputStreams.remove(oos);
 

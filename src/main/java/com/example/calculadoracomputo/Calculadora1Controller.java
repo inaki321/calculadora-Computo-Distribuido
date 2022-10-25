@@ -9,6 +9,9 @@ import javafx.scene.control.Label;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Vector;
 
 public class Calculadora1Controller {
     @FXML
@@ -19,7 +22,15 @@ public class Calculadora1Controller {
     public ObjectOutputStream oos = null;
     public ObjectInputStream ois = null;
 
-    public int nodePort = 1234;
+    public ArrayList<Socket> socketsList =
+            new ArrayList<Socket>();
+    public ArrayList<ObjectOutputStream> oosVector =
+            new ArrayList<ObjectOutputStream>();
+    public ArrayList<ObjectInputStream> oisVector =
+            new ArrayList<ObjectInputStream>();
+
+    public ArrayList<Thread> ossThreads =
+            new ArrayList<Thread>();
 
     public void initialize() throws IOException, ClassNotFoundException {
         labelDisplay.setText("");
@@ -28,15 +39,27 @@ public class Calculadora1Controller {
         host = InetAddress.getLocalHost();
 
         // Create socket
-        socket = new Socket(host.getHostName(), nodePort);
-        System.out.println("Conexion establecida con nodo: " + Integer.toString(nodePort));
+        //nodes, we have nodes from 5200 to 5000 ports
+        for (int i = 5000; i <= 5200; i = i + 1) {
+            //search for nodes between 5200 and 5000
+            try {
+                socket = new Socket(host.getHostName(), i);
+                socketsList.add(socket);
+                System.out.println("Conexion establecida con nodo: " + Integer.toString(i));
+                //Objects OI Stream
+                oos = new ObjectOutputStream(socket.getOutputStream());
+                ois = new ObjectInputStream(socket.getInputStream());
+                oosVector.add(oos);
+                oisVector.add(ois);
+                //Listening thread ObjectInputStream vector
+                t.start();
+                ossThreads.add(t);
+            }
+            catch(Exception e) {
+                //nothing happens
+            }
+        }
 
-        //Objects OI Stream
-        oos = new ObjectOutputStream(socket.getOutputStream());
-        ois = new ObjectInputStream(socket.getInputStream());
-
-        //Listening thread ObjectInputStream
-        t.start();
     }
 
     @FXML
@@ -88,8 +111,11 @@ public class Calculadora1Controller {
         if(!number.matches(".*[a-zA-Z].*")){
 
             // write to socket using ObjectOutputStream
-            System.out.println("Enviando operacion al nodo: "+number);
-            oos.writeObject(number);
+            for (int i =0; i <oosVector.size(); i = i + 1) {
+                //send operation to all nodes
+                System.out.println("Enviando operacion al nodo: "+socketsList.get(i));
+                oosVector.get(i).writeObject(number);
+            }
 
         }
         else {
