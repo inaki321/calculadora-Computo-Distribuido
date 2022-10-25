@@ -14,6 +14,8 @@ public class Nodo {
     public static ArrayList<Socket> clientsList = new ArrayList<Socket>();
     public static ArrayList<ObjectOutputStream> activeOutputStreams = new ArrayList<ObjectOutputStream>();
 
+    public static ArrayList<String> serverMsgs = new ArrayList<String>();
+
     public static void main(String[] args)
     {
         ServerSocket nodoSocket = null;
@@ -89,6 +91,8 @@ public class Nodo {
         private final Socket clientSocket;
         private final ObjectOutputStream oos;
         private final ObjectInputStream ois;
+
+        int clientsIteration = 1;//count to see the iterations between clients
         // Constructor
         public ClientHandler(Socket socket) throws IOException
         {
@@ -101,24 +105,44 @@ public class Nodo {
         public void run()
         {
             try {
-
+                System.out.println("Cuando corre esto ");
+                //when you reach max count, it goes down to 0
                 while(true){
-
                     //convert ObjectInputStream object to String
                     String message = (String) ois.readObject();
-                    System.out.println("Mensaje recibido en el nodo : " + message);
-
+                    //System.out.println("Mensaje recibido en el nodo : " + message);
+                    System.out.println("Clientes conectados "+clientsList.size());
+                    System.out.println("Mensajes recibidos "+serverMsgs.size());
+                    int serverCount = 0;
+                    serverMsgs.add(message);
+                    if(serverMsgs.size() == clientsList.size()){
+                        System.out.println("Di una vuelta a los clientes "+serverMsgs);
+                        for(int k =0; k<=serverMsgs.size()-1;k=k+1 ){
+                            System.out.println("conexiones "+serverMsgs.get(k));
+                            if(serverMsgs.get(k).contains("RES")){
+                                serverCount = serverCount + 1;
+                            }
+                        }
+                    }
                     // Broadcast to all active clients
                     for (int i = 0; i < activeOutputStreams.size(); i++)
                     {
                         ObjectOutputStream temp_oos = activeOutputStreams.get(i);
+                        //check for 3 messages from server
+
 
                         if(temp_oos != oos){
-                            temp_oos.writeObject(message);
+                            temp_oos.writeObject(message+":"+serverCount);
                             System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
-                            System.out.println("-----------------------------------------" );
+                            System.out.println("////////////////////////" );
                         }
                     }
+                    if(serverMsgs.size() == clientsList.size()){
+                        serverMsgs.clear();
+                    }
+                    System.out.println("-----------------------------------------" );
+                    //serverMsgs.clear();
+                   //System.out.println("ARREGLO AL FINAL "+serverMsgs);
                 }
 
             }
