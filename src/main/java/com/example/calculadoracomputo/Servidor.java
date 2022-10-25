@@ -61,58 +61,61 @@ public class Servidor {
                     //convert ObjectInputStream object to String
                     String message = (String) oisVector.get(j).readObject();
 
-                    System.out.println("Mensaje recibido del nodo("+socketsList.get(j)+": " + message);
+                    //if message recieved contains RES, a result ignore it 
+                    if (!message.contains("RES")) {
+                        System.out.println("Mensaje recibido del nodo(" + socketsList.get(j) + ": " + message);
 
-                    //CALCULAR
-                    //character to get in each iteration
-                    Character numberaux;
+                        //CALCULAR
+                        //character to get in each iteration
+                        Character numberaux;
 
-                    //aux number to use in iteration before an space
-                    String numberFromString = "";
+                        //aux number to use in iteration before an space
+                        String numberFromString = "";
 
-                    //suma a ir sumando,restando etc
-                    List<String> operationsArray = new ArrayList<String>();
-                    for (int i = 0; i <= message.length() - 1; i = i + 1) {
-                        numberaux = message.charAt(i);
-                        if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
-                            operationsArray.add(numberFromString);
-                            numberFromString = "";
-                        } else {
-                            numberFromString = numberFromString + numberaux;
-                        }
-                        if (message.length() - 1 == i) {
-                            operationsArray.add(numberFromString);
-                        }
-                    }
-                    float val = 0, res = 0, lastVal = 0;
-                    String opreationSymbol = "";
-                    for (int i = 0; i <= operationsArray.size() - 1; i = i + 1) {
-
-                        try {
-                            val = Float.parseFloat(operationsArray.get(i));
-                            if (opreationSymbol.equals("+")) {
-                                lastVal = lastVal + val;
-                            } else if (opreationSymbol.equals("-")) {
-                                lastVal = lastVal - val;
-                            } else if (opreationSymbol.equals("÷")) {
-                                lastVal = lastVal / val;
-                            } else if (opreationSymbol.equals("x")) {
-                                lastVal = lastVal * val;
+                        //suma a ir sumando,restando etc
+                        List<String> operationsArray = new ArrayList<String>();
+                        for (int i = 0; i <= message.length() - 1; i = i + 1) {
+                            numberaux = message.charAt(i);
+                            if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
+                                operationsArray.add(numberFromString);
+                                numberFromString = "";
+                            } else {
+                                numberFromString = numberFromString + numberaux;
                             }
-                            //for the first iteration just get the last value
-                            if (i == 0) {
-                                lastVal = val;
+                            if (message.length() - 1 == i) {
+                                operationsArray.add(numberFromString);
                             }
-                        } catch (Exception e) {
-                            opreationSymbol = operationsArray.get(i);
-                            Thread.currentThread().interrupt();
                         }
-                    }
-                    System.out.println("Resultado a regresar "+lastVal);
-                    oosVector.get(j).writeObject("RES:"+Double.toString(lastVal));
+                        float val = 0, res = 0, lastVal = 0;
+                        String opreationSymbol = "";
+                        for (int i = 0; i <= operationsArray.size() - 1; i = i + 1) {
 
-                    //terminate the server if client sends exit request
-                    if (message.equalsIgnoreCase("exit")) break;
+                            try {
+                                val = Float.parseFloat(operationsArray.get(i));
+                                if (opreationSymbol.equals("+")) {
+                                    lastVal = lastVal + val;
+                                } else if (opreationSymbol.equals("-")) {
+                                    lastVal = lastVal - val;
+                                } else if (opreationSymbol.equals("÷")) {
+                                    lastVal = lastVal / val;
+                                } else if (opreationSymbol.equals("x")) {
+                                    lastVal = lastVal * val;
+                                }
+                                //for the first iteration just get the last value
+                                if (i == 0) {
+                                    lastVal = val;
+                                }
+                            } catch (Exception e) {
+                                opreationSymbol = operationsArray.get(i);
+                                Thread.currentThread().interrupt();
+                            }
+                        }
+                        System.out.println("Resultado a regresar " + lastVal);
+                        oosVector.get(j).writeObject("RES:" + Double.toString(lastVal));
+
+                        //terminate the server if client sends exit request
+                        if (message.equalsIgnoreCase("exit")) break;
+                    }
                 }
             }
 
