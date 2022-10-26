@@ -100,6 +100,7 @@ public class Servidor {
                         else if(message.contains("/")){
                             resValue = Float.parseFloat(operationsArray.get(0)) / Float.parseFloat(operationsArray.get(2));
                         }
+                        System.out.println("Resultado a enviar: "+resValue);
                         oosVector.get(j).writeObject("RES:" + Double.toString(resValue));
 
                         //terminate the server if client sends exit request

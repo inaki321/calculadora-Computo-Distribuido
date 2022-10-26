@@ -133,6 +133,10 @@ public class Calculadora1Controller {
                 message = (String) ois.readObject();
                 String resSplit[] = message.split(":"); // {type of message},{content}
 
+                if(resSplit[0].equals("RES")){
+                    System.out.println("REsultado: "+resSplit[1]);
+                    System.out.println("Numero de servidores: "+Integer.parseInt(resSplit[2]));
+                }
                 if(resSplit[0].equals("RES") && (Integer.parseInt(resSplit[2]))>2){
                     Platform.runLater(() -> {
                         labelDisplay.setText(resSplit[1]);

@@ -105,44 +105,45 @@ public class Nodo {
         public void run()
         {
             try {
-                System.out.println("Cuando corre esto ");
+                int serverCount = 0;
                 //when you reach max count, it goes down to 0
                 while(true){
                     //convert ObjectInputStream object to String
                     String message = (String) ois.readObject();
                     //System.out.println("Mensaje recibido en el nodo : " + message);
                     System.out.println("Clientes conectados "+clientsList.size());
-                    System.out.println("Mensajes recibidos "+serverMsgs.size());
-                    int serverCount = 0;
                     serverMsgs.add(message);
-                    if(serverMsgs.size() == clientsList.size()){
-                        System.out.println("Di una vuelta a los clientes "+serverMsgs);
-                        for(int k =0; k<=serverMsgs.size()-1;k=k+1 ){
-                            System.out.println("conexiones "+serverMsgs.get(k));
-                            if(serverMsgs.get(k).contains("RES")){
-                                serverCount = serverCount + 1;
-                            }
+
+                    System.out.println("Arreglo antes del loop "+serverMsgs);
+                    for(int k =0; k<serverMsgs.size();k=k+1 ){
+                        System.out.println("REcorro los datos"+serverMsgs.get(k));
+                        if(serverMsgs.get(k).contains("RES")){
+                            System.out.println("ES SERVIDOR");
+                            serverCount = serverCount + 1;
                         }
                     }
+
+                    System.out.println("Conteo de servidores: "+serverCount);
                     // Broadcast to all active clients
                     for (int i = 0; i < activeOutputStreams.size(); i++)
                     {
                         ObjectOutputStream temp_oos = activeOutputStreams.get(i);
                         //check for 3 messages from server
 
-
                         if(temp_oos != oos){
                             temp_oos.writeObject(message+":"+serverCount);
                             System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
-                            System.out.println("////////////////////////" );
+                            System.out.println("");
                         }
                     }
-                    if(serverMsgs.size() == clientsList.size()){
-                        serverMsgs.clear();
+                    for(int k =0; k<serverMsgs.size();k=k+1 ){
+                        if(serverMsgs.size()-1 == clientsList.size()){
+                            serverCount = 0;
+                            System.out.println("Recorri todos las conexiones, reinicio iteraciones");
+                        }
                     }
                     System.out.println("-----------------------------------------" );
                     //serverMsgs.clear();
-                   //System.out.println("ARREGLO AL FINAL "+serverMsgs);
                 }
 
             }
