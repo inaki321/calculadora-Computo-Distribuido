@@ -32,6 +32,9 @@ public class Calculadora1Controller {
     public ArrayList<Thread> ossThreads =
             new ArrayList<Thread>();
 
+    public ArrayList<String> clientIDs =
+            new ArrayList<String>();
+
     public void initialize() throws IOException, ClassNotFoundException {
         labelDisplay.setText("");
 
@@ -52,6 +55,10 @@ public class Calculadora1Controller {
                 oosVector.add(oos);
                 oisVector.add(ois);
                 oos.writeObject("Cliente: "+socket);
+                String socketID=String.valueOf(socket);
+                String idSegments[] = socketID.split("localport=");
+                idSegments[1] = idSegments[1].replace("]","");
+                clientIDs.add(idSegments[1]);
                 //Listening thread ObjectInputStream vector
                 t.start();
                 ossThreads.add(t);
@@ -114,8 +121,8 @@ public class Calculadora1Controller {
             // write to socket using ObjectOutputStream
             for (int i =0; i <oosVector.size(); i = i + 1) {
                 //send operation to all nodes
-                System.out.println("Enviando operacion al nodo: "+socketsList.get(i));
-                oosVector.get(i).writeObject(number);
+                System.out.println("Enviando operacion al nodo: "+socketsList.get(i) +":"+clientIDs.get(i));
+                oosVector.get(i).writeObject(number+"PORT:"+clientIDs.get(i));
             }
 
         }
@@ -135,13 +142,17 @@ public class Calculadora1Controller {
                 String resSplit[] = message.split(":"); // {type of message},{content}
 
                 if(resSplit[0].equals("RES")){
-                    System.out.println("REsultado: "+resSplit[1]);
+                    System.out.println("Resultado: "+resSplit[1]);
                     System.out.println("Numero de servidores: "+Integer.parseInt(resSplit[2]));
+                    System.out.println("Puerto comparar: "+Integer.parseInt(resSplit[3]));
                 }
                 if(resSplit[0].equals("RES") && (Integer.parseInt(resSplit[2]))>2){
-                    Platform.runLater(() -> {
-                        labelDisplay.setText(resSplit[1]);
-                    });
+                    if(clientIDs.contains(resSplit[3])){
+                        Platform.runLater(() -> {
+                            labelDisplay.setText(resSplit[1]);
+                        });
+                    }
+
                 }
 
             } catch (ClassNotFoundException | IOException e) {

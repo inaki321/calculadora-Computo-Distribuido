@@ -18,6 +18,8 @@ public class Nodo {
     public static ArrayList<String> serversID = new ArrayList<String>();
     public static ArrayList<String> clientsID = new ArrayList<String>();
 
+    public static String lastPort = new String();
+
     public static void main(String[] args)
     {
         ServerSocket nodoSocket = null;
@@ -106,7 +108,6 @@ public class Nodo {
         public void run()
         {
             try {
-                int serverCount = 0;
                 //when you reach max count, it goes down to 0
                 while(true){
                     //convert ObjectInputStream object to String
@@ -115,6 +116,7 @@ public class Nodo {
                     System.out.println("No. de conexiones activas "+clientsList.size());
                     //serverMsgs.add(message);
 
+                    System.out.println("MENSAJE RECIBIDO EN EL NODO: "+message);
                     //add servers when connect
                     //just one message when it starts
                     if(message.contains("Servidor")){
@@ -123,6 +125,12 @@ public class Nodo {
                     if(message.contains("Cliente")){
                         clientsID.add(message);
                     }
+                    if(message.contains("PORT")){
+                        String portRecieved[] = message.split("PORT:");
+                        lastPort = portRecieved[1];
+                        message = portRecieved[0];
+                    }
+                    System.out.println("Calculadora que envio el dato "+lastPort);
                     System.out.println("Servidores: "+serversID.size() +" // "+serversID);
                     System.out.println("Clientes: "+clientsID.size() +" // "+clientsID);
 
@@ -133,7 +141,7 @@ public class Nodo {
                         //check for 3 messages from server
 
                         if(temp_oos != oos){
-                            temp_oos.writeObject(message+":"+serversID.size());
+                            temp_oos.writeObject(message+":"+serversID.size()+":"+lastPort);
                             System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
                             System.out.println("");
                         }

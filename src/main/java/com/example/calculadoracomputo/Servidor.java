@@ -67,7 +67,7 @@ public class Servidor {
 
                         System.out.println("Mensaje recibido en servidor: "+message);
 
-                        if(!(message.contains("Servidor:")) && !(message.contains("Cliente:")) ){
+                        if(!(message.contains("Servidor:")) && !(message.contains("Cliente:") ) ){
                         //split message
                         //character to get in each iteration
                         Character numberaux;
