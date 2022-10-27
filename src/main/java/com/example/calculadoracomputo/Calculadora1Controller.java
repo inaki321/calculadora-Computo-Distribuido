@@ -51,6 +51,7 @@ public class Calculadora1Controller {
                 ois = new ObjectInputStream(socket.getInputStream());
                 oosVector.add(oos);
                 oisVector.add(ois);
+                oos.writeObject("Cliente: "+socket);
                 //Listening thread ObjectInputStream vector
                 t.start();
                 ossThreads.add(t);

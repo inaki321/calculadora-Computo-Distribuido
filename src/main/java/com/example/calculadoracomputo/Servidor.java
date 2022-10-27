@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Servidor {
     //get the localhost IP address
@@ -42,8 +43,10 @@ public class Servidor {
                 //read write from ObjectInputStream ObjectOutputStream objects
                 ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
                 ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                //oos.writeObject("Servidor:"+ socket);
                 oisVector.add(ois);
                 oosVector.add(oos);
+                oos.writeObject("Servidor: "+socket);
             }
             catch(Exception e) {
                 //nothing happens
@@ -55,59 +58,62 @@ public class Servidor {
             //send operation to all nodes
 
             while (true) {
-                for (int j =0; j <oisVector.size(); j = j + 1) {
-                    System.out.println("Esperando solictud...");
 
-                    //convert ObjectInputStream object to String
-                    String message = (String) oisVector.get(j).readObject();
+                    for (int j = 0; j < oisVector.size(); j = j + 1) {
+                        System.out.println("Esperando solictud...");
 
-                    //split message
-                    //character to get in each iteration
-                    Character numberaux;
+                        //convert ObjectInputStream object to String
+                        String message = (String) oisVector.get(j).readObject();
 
-                    //aux number to use in iteration before an space
-                    String numberFromString = "";
+                        System.out.println("Mensaje recibido en servidor: "+message);
 
-                    //suma a ir sumando,restando etc
-                    List<String> operationsArray = new ArrayList<String>();
-                    for (int i = 0; i <= message.length() - 1; i = i + 1) {
-                        numberaux = message.charAt(i);
-                        if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
-                            operationsArray.add(numberFromString);
-                            numberFromString = "";
-                        } else {
-                            numberFromString = numberFromString + numberaux;
+                        if(!(message.contains("Servidor:")) && !(message.contains("Cliente:")) ){
+                        //split message
+                        //character to get in each iteration
+                        Character numberaux;
+
+                        //aux number to use in iteration before an space
+                        String numberFromString = "";
+
+                        //suma a ir sumando,restando etc
+                        List<String> operationsArray = new ArrayList<String>();
+                        for (int i = 0; i <= message.length() - 1; i = i + 1) {
+                            numberaux = message.charAt(i);
+                            if (numberaux == ' ') { //remove blank spaces and get complete numbers before new number
+                                operationsArray.add(numberFromString);
+                                numberFromString = "";
+                            } else {
+                                numberFromString = numberFromString + numberaux;
+                            }
+                            if (message.length() - 1 == i) {
+                                operationsArray.add(numberFromString);
+                            }
                         }
-                        if (message.length() - 1 == i) {
-                            operationsArray.add(numberFromString);
+
+
+                        //if message recieved contains RES, a result ignore it
+                        float resValue = 0;
+                        if (!message.contains("RES")) {
+                            operationsArray.set(2, String.valueOf(operationsArray.get(2).split(":")[0]));
+                            if (message.contains("+")) {
+                                resValue = Float.parseFloat(operationsArray.get(0)) + Float.parseFloat(operationsArray.get(2));
+                            } else if (message.contains("-")) {
+                                resValue = Float.parseFloat(operationsArray.get(0)) - Float.parseFloat(operationsArray.get(2));
+                            } else if (message.contains("*")) {
+                                resValue = Float.parseFloat(operationsArray.get(0)) * Float.parseFloat(operationsArray.get(2));
+                            } else if (message.contains("/")) {
+                                resValue = Float.parseFloat(operationsArray.get(0)) / Float.parseFloat(operationsArray.get(2));
+                            }
+                            System.out.println("Resultado a enviar: " + resValue);
+                            oosVector.get(j).writeObject("RES:" + Double.toString(resValue));
+
+                            //terminate the server if client sends exit request
+                            if (message.equalsIgnoreCase("exit")) break;
                         }
                     }
-
-
-                    //if message recieved contains RES, a result ignore it
-                    float resValue=0;
-                    if (!message.contains("RES")) {
-                        operationsArray.set(2, String.valueOf(operationsArray.get(2).split(":")[0]));
-                        if(message.contains("+")){
-                            resValue = Float.parseFloat(operationsArray.get(0)) + Float.parseFloat(operationsArray.get(2));
-                        }
-                        else if(message.contains("-")){
-                            resValue = Float.parseFloat(operationsArray.get(0)) - Float.parseFloat(operationsArray.get(2));
-                        }
-                        else if(message.contains("*")){
-                            resValue = Float.parseFloat(operationsArray.get(0)) * Float.parseFloat(operationsArray.get(2));
-                        }
-                        else if(message.contains("/")){
-                            resValue = Float.parseFloat(operationsArray.get(0)) / Float.parseFloat(operationsArray.get(2));
-                        }
-                        System.out.println("Resultado a enviar: "+resValue);
-                        oosVector.get(j).writeObject("RES:" + Double.toString(resValue));
-
-                        //terminate the server if client sends exit request
-                        if (message.equalsIgnoreCase("exit")) break;
                     }
                 }
-            }
+
 
         //close resources
         //ois.close();

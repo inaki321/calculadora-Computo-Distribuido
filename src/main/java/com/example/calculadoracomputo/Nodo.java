@@ -15,6 +15,8 @@ public class Nodo {
     public static ArrayList<ObjectOutputStream> activeOutputStreams = new ArrayList<ObjectOutputStream>();
 
     public static ArrayList<String> serverMsgs = new ArrayList<String>();
+    public static ArrayList<String> serversID = new ArrayList<String>();
+    public static ArrayList<String> clientsID = new ArrayList<String>();
 
     public static void main(String[] args)
     {
@@ -58,8 +60,7 @@ public class Nodo {
 
                 // Displaying that new client is connected
                 // to server
-                System.out.println("Nueva conexion: " + client.getRemoteSocketAddress());
-
+                System.out.println("Nueva conexion... ");
                 // create a new thread object
                 ClientHandler clientSock = new ClientHandler(client);
 
@@ -92,7 +93,7 @@ public class Nodo {
         private final ObjectOutputStream oos;
         private final ObjectInputStream ois;
 
-        int clientsIteration = 1;//count to see the iterations between clients
+        int clientsIteration = 0;//count to see the iterations between clients
         // Constructor
         public ClientHandler(Socket socket) throws IOException
         {
@@ -111,35 +112,30 @@ public class Nodo {
                     //convert ObjectInputStream object to String
                     String message = (String) ois.readObject();
                     //System.out.println("Mensaje recibido en el nodo : " + message);
-                    System.out.println("Clientes conectados "+clientsList.size());
-                    serverMsgs.add(message);
+                    System.out.println("No. de conexiones activas "+clientsList.size());
+                    //serverMsgs.add(message);
 
-                    System.out.println("Arreglo antes del loop "+serverMsgs);
-                    for(int k =0; k<serverMsgs.size();k=k+1 ){
-                        System.out.println("REcorro los datos"+serverMsgs.get(k));
-                        if(serverMsgs.get(k).contains("RES")){
-                            System.out.println("ES SERVIDOR");
-                            serverCount = serverCount + 1;
-                        }
+                    //add servers when connect
+                    //just one message when it starts
+                    if(message.contains("Servidor")){
+                        serversID.add(message);
                     }
+                    if(message.contains("Cliente")){
+                        clientsID.add(message);
+                    }
+                    System.out.println("Servidores: "+serversID.size() +" // "+serversID);
+                    System.out.println("Clientes: "+clientsID.size() +" // "+clientsID);
 
-                    System.out.println("Conteo de servidores: "+serverCount);
-                    // Broadcast to all active clients
+
                     for (int i = 0; i < activeOutputStreams.size(); i++)
                     {
                         ObjectOutputStream temp_oos = activeOutputStreams.get(i);
                         //check for 3 messages from server
 
                         if(temp_oos != oos){
-                            temp_oos.writeObject(message+":"+serverCount);
+                            temp_oos.writeObject(message+":"+serversID.size());
                             System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
                             System.out.println("");
-                        }
-                    }
-                    for(int k =0; k<serverMsgs.size();k=k+1 ){
-                        if(serverMsgs.size()-1 == clientsList.size()){
-                            serverCount = 0;
-                            System.out.println("Recorri todos las conexiones, reinicio iteraciones");
                         }
                     }
                     System.out.println("-----------------------------------------" );
@@ -149,9 +145,29 @@ public class Nodo {
             }
             catch (IOException e) {
                 System.out.println("*Conexion finalizada con: " + clientSocket.getRemoteSocketAddress());
+                String socketRemoved=String.valueOf(clientSocket.getRemoteSocketAddress());
+                String segments[] = socketRemoved.split(":");
+                for(int c=0 ;c< serversID.size();c=c+1){
+                    String serverToRemove = serversID.get(c).replace("Servidor: ","");
+                    String segmentsLoop[] = serverToRemove.split("localport=");
+                    segmentsLoop[1] = segmentsLoop[1].replace("]","");
+                    if(segmentsLoop[1].equals(segments[1])){
+                        System.out.println("Quitar este "+serversID.remove(c));
+                    }
+                }
+                for(int c=0 ;c< clientsID.size();c=c+1){
+                    String serverToRemove = clientsID.get(c).replace("Servidor: ","");
+                    String segmentsLoop[] = serverToRemove.split("localport=");
+                    segmentsLoop[1] = segmentsLoop[1].replace("]","");
+
+                    if(segmentsLoop[1].equals(segments[1])){
+                        System.out.println("Quitar este "+clientsID.remove(c));
+                    }
+                }
+                System.out.println("Servers after remove: "+serversID);
+                System.out.println("Clients after remove: "+clientsID);
                 clientsList.remove(clientSocket);
                 activeOutputStreams.remove(oos);
-
             } catch (ClassNotFoundException ex) {
                 
 //                System.Logger.getLogger(Nodo.class.getName()).log(Level.SEVERE, null, ex);
