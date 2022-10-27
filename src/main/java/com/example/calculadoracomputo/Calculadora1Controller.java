@@ -6,6 +6,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -16,6 +18,9 @@ import java.util.Vector;
 public class Calculadora1Controller {
     @FXML
     private Label labelDisplay;
+
+    @FXML
+    private TextArea logs;
     //get the localhost IP address 
     public InetAddress host;
     public Socket socket = null;
@@ -49,6 +54,10 @@ public class Calculadora1Controller {
                 socket = new Socket(host.getHostName(), i);
                 socketsList.add(socket);
                 System.out.println("Conexion establecida con nodo: " + Integer.toString(i));
+                int finalI = i;
+                Platform.runLater(()->{
+                    logs.appendText("Conexion establecida con nodo: " + Integer.toString(finalI)+"\n");
+                });
                 //Objects OI Stream
                 oos = new ObjectOutputStream(socket.getOutputStream());
                 ois = new ObjectInputStream(socket.getInputStream());
@@ -122,6 +131,10 @@ public class Calculadora1Controller {
             for (int i =0; i <oosVector.size(); i = i + 1) {
                 //send operation to all nodes
                 System.out.println("Enviando operacion al nodo: "+socketsList.get(i) +":"+clientIDs.get(i));
+                int finalI = i;
+                Platform.runLater(()->{
+                    logs.appendText("Enviando operacion al nodo: "+socketsList.get(finalI) +":"+clientIDs.get(finalI)+"\n");
+                });
                 oosVector.get(i).writeObject(number+"PORT:"+clientIDs.get(i));
             }
 
@@ -136,6 +149,11 @@ public class Calculadora1Controller {
         //Here write all actions that you want execute on background
         while(true){
 
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             String message;
             try {
                 message = (String) ois.readObject();
@@ -145,8 +163,14 @@ public class Calculadora1Controller {
                     System.out.println("Resultado: "+resSplit[1]);
                     System.out.println("Numero de servidores: "+Integer.parseInt(resSplit[2]));
                     System.out.println("Puerto comparar: "+Integer.parseInt(resSplit[3]));
+                    Platform.runLater(()->{
+                        logs.appendText("Resultado: "+resSplit[1]+"\n");
+                        logs.appendText("Numero de servidores: "+Integer.parseInt(resSplit[2])+"\n");
+                        logs.appendText("Puerto comparar: "+Integer.parseInt(resSplit[3])+"\n");
+                    });
                 }
                 if(resSplit[0].equals("RES") && (Integer.parseInt(resSplit[2]))>2){
+                    //check if the msg recieved is from my calculator
                     if(clientIDs.contains(resSplit[3])){
                         Platform.runLater(() -> {
                             labelDisplay.setText(resSplit[1]);
@@ -159,6 +183,9 @@ public class Calculadora1Controller {
                 e.printStackTrace();
             }
 
+            Platform.runLater(()->{
+                logs.appendText("----------------------------"+"\n");
+            });
         }
 
     });

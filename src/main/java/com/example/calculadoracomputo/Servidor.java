@@ -1,11 +1,13 @@
 package com.example.calculadoracomputo;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -93,12 +95,34 @@ public class Servidor {
 
                         //if message recieved contains RES, a result ignore it
                         float resValue = 0;
+                            URL[] classLoaderUrls;
+                            URLClassLoader urlClassLoader;
+                            Class<?> clazz;
                         if (!message.contains("RES")) {
                             operationsArray.set(2, String.valueOf(operationsArray.get(2).split(":")[0]));
                             if (message.contains("+")) {
                                 resValue = Float.parseFloat(operationsArray.get(0)) + Float.parseFloat(operationsArray.get(2));
                             } else if (message.contains("-")) {
                                 resValue = Float.parseFloat(operationsArray.get(0)) - Float.parseFloat(operationsArray.get(2));
+                                //Operation classes constructor's param String event, String footprint, float n1, float n2, int port
+                                try {
+                                    Class<?> cls = Class.forName("Suma");
+                                    System.out.println("Existe cls "+cls);
+                                    File file = new File("/Users/super/Desktop/7mo Semestre/computo dist/Ejemplo 1 java/calculadoraComputo/src/microservoperaciones/suma/suma.jar");
+                                    URL url = new URL("file:"+file.getAbsolutePath());
+                                    URLClassLoader classLoader = new URLClassLoader(new URL[]{url}, Servidor.class.getClassLoader());
+                                    Class <?> clase = classLoader.loadClass("Suma");
+                                    System.out.println("CLAse: "+clase);
+                                    for(Method me: clase.getMethods()){
+                                        if(me.getName().equals("run")){
+                                            System.out.println("SI HAY PARA CORRER AHUEVO ");
+                                            break;
+                                        }
+                                    }
+                                    //ct.newInstance(Float.parseFloat(operationsArray.get(0)),Float.parseFloat(operationsArray.get(2)) );
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                }
                             } else if (message.contains("*")) {
                                 resValue = Float.parseFloat(operationsArray.get(0)) * Float.parseFloat(operationsArray.get(2));
                             } else if (message.contains("/")) {
