@@ -89,7 +89,7 @@ public class Nodo1Controller {
 
                 System.out.println("Nueva conexion... ");
                 // create a new thread object
-                NodeHandler clientSock = new NodeHandler(client);
+                NodeHandler clientSock = new NodeHandler(client,nodoText);
 
                 // This thread will handle the client
                 // separately

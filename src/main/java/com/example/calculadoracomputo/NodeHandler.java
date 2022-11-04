@@ -1,5 +1,8 @@
 package com.example.calculadoracomputo;
 
+import javafx.application.Platform;
+import javafx.scene.control.TextArea;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -19,15 +22,17 @@ public class NodeHandler implements Runnable {
 
     public static String lastPort = new String();
 
+    private TextArea textUI = null;
+
     int clientsIteration = 0;//count to see the iterations between clients
     // Constructor
-    public NodeHandler(Socket socket) throws IOException
+    public NodeHandler(Socket socket,TextArea text ) throws IOException
     {
         this.clientSocket = socket;
         this.oos = new ObjectOutputStream(socket.getOutputStream());
         this.ois = new ObjectInputStream(socket.getInputStream());
         activeOutputStreams.add(oos); // add oos a la lista
-        System.out.println("holaa ");
+        this.textUI = text;
     }
 
     public void run()
@@ -43,6 +48,10 @@ public class NodeHandler implements Runnable {
                 //serverMsgs.add(message);
 
                 System.out.println("MENSAJE RECIBIDO EN EL NODO: "+message);
+                String finalMessage = message;
+                Platform.runLater(()->{
+                    textUI.appendText("MENSAJE RECIBIDO EN EL NODO: "+ finalMessage+"\n");
+                });
                 //add servers when connect
                 //just one message when it starts
                 if(message.contains("Servidor")){
@@ -56,6 +65,11 @@ public class NodeHandler implements Runnable {
                     lastPort = portRecieved[1];
                     message = portRecieved[0];
                 }
+                Platform.runLater(()->{
+                    textUI.appendText("Calculadora que envio el dato "+lastPort+"\n");
+                    textUI.appendText("Servidores: "+serversID.size() +" // "+serversID+"\n");
+                    textUI.appendText("Clientes: "+clientsID.size() +" // "+clientsID+"\n");
+                });
                 System.out.println("Calculadora que envio el dato "+lastPort);
                 System.out.println("Servidores: "+serversID.size() +" // "+serversID);
                 System.out.println("Clientes: "+clientsID.size() +" // "+clientsID);
@@ -68,17 +82,27 @@ public class NodeHandler implements Runnable {
 
                     if(temp_oos != oos){
                         temp_oos.writeObject(message+":"+serversID.size()+":"+lastPort);
+                        String finalMessage1 = message;
+                        Platform.runLater(()->{
+                            textUI.appendText(finalMessage1 +":"+serversID.size()+":"+lastPort+"\n");
+                        });
                         //System.out.println("Enviando mensaje: " + message + " a las conexiones existentes ( "+clientsList.size()+") "+  clientsList.get(i));
                         System.out.println("");
                     }
                 }
+                Platform.runLater(()->{
+                    textUI.appendText("-----------------------------------------" +"\n");
+                });
                 System.out.println("-----------------------------------------" );
                 //serverMsgs.clear();
             }
 
         }
         catch (IOException e) {
-            System.out.println("*Conexion finalizada con: " + clientSocket.getRemoteSocketAddress());
+            System.out.println("*Removed conection: " + clientSocket.getRemoteSocketAddress());
+            Platform.runLater(()->{
+                textUI.appendText("*Removed conection: " + clientSocket.getRemoteSocketAddress()+"\n");
+            });
             String socketRemoved=String.valueOf(clientSocket.getRemoteSocketAddress());
             String segments[] = socketRemoved.split(":");
             for(int c=0 ;c< serversID.size();c=c+1){
@@ -98,6 +122,10 @@ public class NodeHandler implements Runnable {
                     System.out.println("Quitar este "+clientsID.remove(c));
                 }
             }
+            Platform.runLater(()->{
+                textUI.appendText("Servers after remove: "+serversID+"\n");
+                textUI.appendText("Clients after remove: "+clientsID+"\n");
+            });
             System.out.println("Servers after remove: "+serversID);
             System.out.println("Clients after remove: "+clientsID);
             clientsList.remove(clientSocket);
