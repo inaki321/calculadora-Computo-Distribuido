@@ -90,7 +90,7 @@ public class Nodo {
         }
     }
 
-    private static class ClientHandler implements Runnable {
+    public static class ClientHandler implements Runnable {
         private final Socket clientSocket;
         private final ObjectOutputStream oos;
         private final ObjectInputStream ois;
