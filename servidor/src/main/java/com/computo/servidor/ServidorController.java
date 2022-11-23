@@ -42,7 +42,7 @@ public class ServidorController {
             serversystemout.appendText("Recibo:"+num1+" y tambien: "+num2+"\n");
             serversystemout.appendText("Metodo a llamar:"+type+"\n");
         });
-        File dir = new File("/Users/super/Desktop/7mo Semestre/computo dist/Ejemplo 1 java/calculadoraComputo/src/microservoperaciones/microservice.jar");
+        File dir = new File("/Users/super/Desktop/7mo Semestre/computo dist/Ejemplo 1 java/calculadoraComputo/microservice/out/artifacts/microservice_jar/microservice.jar");
         Class<?> cls = new URLClassLoader(new URL[] { dir.toURI().toURL() }).loadClass("Microservicios");
         Method subMethod = cls.getMethod(type, float.class, float.class);
         Object objInstance = cls.getDeclaredConstructor().newInstance();
