@@ -130,6 +130,15 @@ public class NodeHandler implements Runnable {
             System.out.println("Clients after remove: "+clientsID);
             clientsList.remove(clientSocket);
             activeOutputStreams.remove(oos);
+            if(serversID.size() < 3){
+                System.out.println("Se debe duplicar servidor  ");
+                ProcessBuilder pb = new ProcessBuilder("java", "-jar", "/Users/super/Desktop/7mo Semestre/computo dist/Ejemplo 1 java/calculadoraComputo/servidor/out/artifacts/servidor_jar/servidor.jar");
+                try {
+                    Process p = pb.start();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         } catch (ClassNotFoundException ex) {
 
 //                System.Logger.getLogger(Nodo.class.getName()).log(Level.SEVERE, null, ex);
